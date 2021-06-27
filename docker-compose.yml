@@ -79,5 +79,5 @@ services:
     command: gunicorn -w 2 --bind :5000 amundsen_application.wsgi
 
 networks:
-  datalake_ml_platform:
+  ml_platform:
     external: true
