@@ -13,7 +13,7 @@ services:
       - 7474:7474
       - 7687:7687
     networks:
-      - datalake_ml_platform
+      - ml_platform
 
   elasticsearch:
     image: elasticsearch:6.7.0
@@ -21,11 +21,11 @@ services:
     ports:
         - 9200:9200
     networks:
-      - datalake_ml_platform
+      - ml_platform
     ulimits:
       nofile:
-        soft: 262144
-        hard: 262144
+        soft: 65536
+        hard: 65536
 
   amundsensearch:
     image: amundsendev/amundsen-search:2.4.1
@@ -35,7 +35,7 @@ services:
     depends_on:
       - elasticsearch
     networks:
-      - datalake_ml_platform
+      - ml_platform
     environment:
       - PROXY_ENDPOINT=es_amundsen
     command: gunicorn -w 2 --bind :5000 search_service.search_wsgi
@@ -48,7 +48,7 @@ services:
     ports:
       - 5002:5000
     networks:
-      - datalake_ml_platform
+      - ml_platform
     environment:
        - PROXY_HOST=bolt://neo4j_amundsen
     command: gunicorn -w 2 --bind :5000 metadata_service.metadata_wsgi
@@ -62,15 +62,15 @@ services:
     ports:
       - 5000:5000
     networks:
-      - datalake_ml_platform
+      - ml_platform
     environment:
       - SEARCHSERVICE_BASE=http://amundsensearch:5000
       - METADATASERVICE_BASE=http://amundsenmetadata:5000
-      - PREVIEW_CLIENT_ENABLED: ${PREVIEW_CLIENT_ENABLED}
-      - PREVIEW_CLIENT: ${PREVIEW_CLIENT}
-      - PREVIEW_CLIENT_URL: ${PREVIEW_CLIENT_URL}
-      - PREVIEW_CLIENT_USERNAME: ${PREVIEW_CLIENT_USERNAME}
-      - PREVIEW_CLIENT_PASSWORD: ${PREVIEW_CLIENT_PASSWORD}
+      - PREVIEW_CLIENT_ENABLED=${PREVIEW_CLIENT_ENABLED}
+      - PREVIEW_CLIENT=${PREVIEW_CLIENT}
+      - PREVIEW_CLIENT_URL=${PREVIEW_CLIENT_URL}
+      - PREVIEW_CLIENT_USERNAME=${PREVIEW_CLIENT_USERNAME}
+      - PREVIEW_CLIENT_PASSWORD=${PREVIEW_CLIENT_PASSWORD}
       # Only for easy config-less Quickstart bookmark evalutation. `TestConfig` extends ordinary `LocalConfig` by
       # defining `AUTH_USER_METHOD` to a hardcoded dummy user in `amundsen_application.tests.test_utils.get_test_user()`
       # See further docs in https://github.com/amundsen-io/amundsenfrontendlibrary/blob/master/docs/configuration.md#flask
