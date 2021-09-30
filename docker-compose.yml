@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   neo4j:
-    image: neo4j:3.5.26
+    image: neo4j:3.5.29
     container_name: neo4j_amundsen
     environment:
       - NEO4J_AUTH=neo4j/test
@@ -12,14 +12,18 @@ services:
     ports:
       - 7474:7474
       - 7687:7687
+    volumes:
+      - neo4j_data:/data
     networks:
       - ml_platform
 
   elasticsearch:
-    image: elasticsearch:6.7.0
+    image: elasticsearch:6.8.18
     container_name: es_amundsen
     ports:
         - 9200:9200
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
     networks:
       - ml_platform
     ulimits:
@@ -28,7 +32,7 @@ services:
         hard: 65536
 
   amundsensearch:
-    image: amundsendev/amundsen-search:2.4.1
+    image: amundsendev/amundsen-search:2.11.1
     container_name: amundsensearch
     ports:
       - 5001:5000
@@ -41,7 +45,7 @@ services:
     command: gunicorn -w 2 --bind :5000 search_service.search_wsgi
 
   amundsenmetadata:
-    image: amundsendev/amundsen-metadata:3.3.0
+    image: amundsendev/amundsen-metadata:3.9.0
     container_name: amundsenmetadata
     depends_on:
       - neo4j
@@ -54,7 +58,7 @@ services:
     command: gunicorn -w 2 --bind :5000 metadata_service.metadata_wsgi
 
   amundsenfrontend:
-    image: amundsendev/amundsen-frontend:3.1.0
+    image: amundsendev/amundsen-frontend:3.12.0
     container_name: amundsenfrontend
     depends_on:
       - amundsenmetadata
@@ -81,3 +85,7 @@ services:
 networks:
   ml_platform:
     external: true
+
+volumes:
+  es_data:
+  neo4j_data:
